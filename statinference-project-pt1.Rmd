@@ -42,26 +42,40 @@ Illustrate via simulation and associated explanatory text the properties of the 
 1. Show where the distribution is centered at and compare it to the theoretical center of the distribution.
 
 ```{r pt1_1, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+tommy.tutone <- 8675309
+set.seed(tommy.tutone)
+
+
 ```
 
 2. Show how variable it is and compare it to the theoretical variance of the distribution.
 
 ```{r pt1_2, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+sir.mix.a.lot <- 18006492568
+set.seed(mix.a.lot)
+
 ```
 
 3. Show that the distribution is approximately normal.
 
 ```{r pt1_3, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+b52s <- 6060842
+set.seed(b52s)
+
 ```
 
 
 4. Evaluate the coverage of the confidence interval for $\frac{1}{\lambda}$: $\overline{X}\pm{1.96}\frac{s}{\sqrt{n}}$.
 
 ```{r pt1_4, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+the.time <- 7779311
+set.seed(the.time)
+
+
 ```
 
 ### Evaluation notes

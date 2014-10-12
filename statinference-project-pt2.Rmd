@@ -41,25 +41,37 @@ Now in the second portion of the class, we're going to analyze the ToothGrowth d
 1. Load the ToothGrowth data and perform some basic exploratory data analyses.
 
 ```{r pt2_1, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+alicia.keys <- 4894608
+set.seed(alicia.keys)
+
 ```
 
 2. Provide a basic summary of the data.
 
 ```{r pt2_2, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+mike.jones <- 3302818004
+set.seed(mike.jones)
+
 ```
 
 3. Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose. (Use the techniques from class even if there's other approaches worth considering)
 
 ```{r pt2_3, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+public.enemy <- 911
+set.seed(public.enemy)
+
 ```
 
 4. State your conclusions and the assumptions needed for your conclusions. 
 
 ```{r pt2_4, echo = SHOW.ALL | TRUE, cache = FALSE}
-# solve a problem here
+# set the seed so others can reproduce easily
+soulja.boy <- 6789998212
+set.seed(soulja.boy)
+
 ```
 
 ### Evalutation notes
