@@ -53,8 +53,8 @@ set.seed(tommy.tutone)
 
 ```{r pt1_2, echo = SHOW.ALL | TRUE, cache = FALSE}
 # set the seed so others can reproduce easily
-sir.mix.a.lot <- 18006492568
-set.seed(mix.a.lot)
+sir.mix.a.lot <- 6492568
+set.seed(sir.mix.a.lot)
 
 ```
 

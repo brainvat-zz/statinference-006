@@ -51,7 +51,7 @@ set.seed(alicia.keys)
 
 ```{r pt2_2, echo = SHOW.ALL | TRUE, cache = FALSE}
 # set the seed so others can reproduce easily
-mike.jones <- 3302818004
+mike.jones <- 2818004
 set.seed(mike.jones)
 
 ```
@@ -69,7 +69,7 @@ set.seed(public.enemy)
 
 ```{r pt2_4, echo = SHOW.ALL | TRUE, cache = FALSE}
 # set the seed so others can reproduce easily
-soulja.boy <- 6789998212
+soulja.boy <- 9998212
 set.seed(soulja.boy)
 
 ```
