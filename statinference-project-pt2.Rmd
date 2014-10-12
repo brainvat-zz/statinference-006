@@ -1,0 +1,106 @@
+---
+title: "Statistical Inference Course Project, Part 2"
+author: "Allen Hammock"
+date: "October 12, 2014"
+output: html_document
+---
+```{r compile_opts, echo = FALSE}
+    SHOW.ALL <- FALSE
+    suppressMessages(library(knitr))
+    opts_knit$set(verbose = SHOW.ALL, progress = TRUE)
+```
+
+```{r initialize, echo = SHOW.ALL | FALSE}
+# set the working directory
+setwd("~/Google Drive/projects/r/coursera/statinference-006")
+
+# pre-load all required dependencies
+load.package <- function(x) {
+    if (!suppressMessages(require(x, character.only = TRUE))) {
+        warning(paste("WARNING. Package", x, "not found. Installing now."))
+        install.packages(x, dep = TRUE)
+        if(!require(x, character.only = TRUE)) {
+            stop(paste("ABORT. Package", x, "not found"))
+        }
+    }
+}
+
+required.packages <- c("dplyr", "ggplot2")
+for(i in 1:length(required.packages)) {
+    load.package(required.packages[i])   
+}
+```
+# Background
+
+## Part 2
+
+### Problems
+
+Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
+
+1. Load the ToothGrowth data and perform some basic exploratory data analyses.
+
+```{r pt2_1, echo = SHOW.ALL | TRUE, cache = FALSE}
+# solve a problem here
+```
+
+2. Provide a basic summary of the data.
+
+```{r pt2_2, echo = SHOW.ALL | TRUE, cache = FALSE}
+# solve a problem here
+```
+
+3. Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose. (Use the techniques from class even if there's other approaches worth considering)
+
+```{r pt2_3, echo = SHOW.ALL | TRUE, cache = FALSE}
+# solve a problem here
+```
+
+4. State your conclusions and the assumptions needed for your conclusions. 
+
+```{r pt2_4, echo = SHOW.ALL | TRUE, cache = FALSE}
+# solve a problem here
+```
+
+### Evalutation notes
+
+*Did the student perform an exploratory data analysis?*
+
+0: No<br />
+1: Yes
+
+*Did the student give a basic information summarizing the data set?*
+
+0: No<br />
+1: Yes
+
+*Did the student perform some relevant confidence intervals and/or tests?*
+
+0: No<br />
+1: Yes
+
+*Were the results of the tests and/or intervals interpreted in the context of the problem correctly? *
+
+0: No<br />
+1: Yes
+
+*Did the student investigate the assumptions needed for their conclusions?*
+
+0: No<br />
+1: Yes
+
+*Were multiple comparisons discussed appropriately?*
+
+0: No<br />
+1: Yes
+
+*Here's your opportunity to give this project +1 for effort. Did the student basically try to answer the question?*
+
+0: No it really was a poor effort<br />
+1: Yes, this was a nice attempt (regardless of correctness)
+
+
+```{r finalize, echo = SHOW.ALL | FALSE}
+# save working image so we can look at it later
+save.image("~/Google Drive/projects/r/coursera/statinference-006/statinference-006-pt2.RData")
+```
