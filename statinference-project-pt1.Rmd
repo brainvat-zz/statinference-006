@@ -1,7 +1,6 @@
 ---
 title: "Statistical Inference Course Project, Part I"
-author: "Allen Hammock"
-date: "October 12, 2014"
+author: "Allen Hammock (brainvat)"
 output: html_document
 ---
 ```{r compile_opts, echo = FALSE}
@@ -30,53 +29,114 @@ for(i in 1:length(required.packages)) {
     load.package(required.packages[i])   
 }
 ```
-# Background
 
-## Part 1
+# The Exponential Distribution
 
-### Problems
-The exponential distribution can be simulated in R with `rexp(n, lambda)` where `lambda` is the rate parameter. The mean of exponential distribution is $\frac{1}{\lambda}$ and the standard deviation is also also $\frac{1}{\lambda}$. Set $\lambda={0.2}$ for all of the simulations. In this simulation, you will investigate the distribution of averages of 40 exponential(0.2)s. Note that you will need to do a thousand or so simulated averages of 40 exponentials.
+## $$
+    f(x)=\lambda e^{-\lambda x}
+$$
 
-Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponential(0.2)s. 
+The exponential distribution has its name because its probability distribution function has the shape of the exponential function. It crosses the Y-axis at some positive value called $\lambda$ and slopes downwards to the right, decreasing towards zero as the values of random variable $X$ increase, never reaching zero. The amount of slope in the curve is determined by the value of $\lambda$, also called *the rate*.
 
-1. Show where the distribution is centered at and compare it to the theoretical center of the distribution.
+*Definition and graph adapted from http://www.ynegve.info/Post/169/a-tutorial-on-probability-and-exponential-distribution*
+
+```{r fig0, echo = SHOW.ALL | TRUE, cache = FALSE}
+x = seq(0, 40, length = 200)
+y = dexp(x, rate = 0.2)
+plot(x, y, type="l", lwd = 2, col = "red", ylab = "p")
+x = seq(0, 4, length = 200)
+y = dexp(x, rate = 0.2)
+polygon(c(0, x, 4), c(0, y, 0), col = "lightgray")
+```
+
+The exponential distribution can be simulated in R with `rexp(n, lambda)` where `lambda` is the rate parameter. The mean or expected
+value of the exponential distribution is $\frac{1}{\lambda}$ and the standard deviation is also also $\frac{1}{\lambda}$. 
+
+## Theoretical Center
+
+First, given values for the rate $\lambda$, we show where the distribution is centered at and compare it to the theoretical center 
+of the distribution.  In this case, where $\lambda = 0.2$, the central tendency or mean is expected to be 
+$E[x] = \frac{1}{\lambda} = \frac{1}{0.2} = 5$.
 
 ```{r pt1_1, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-tommy.tutone <- 8675309
-set.seed(tommy.tutone)
+lambda <- 0.2      # rate of descent
+mu <- 1/lambda     # expected value 
+sigma <- 1/lambda  # standard deviation 
+```
+
+Here, we illustrate through simulation that `rexp(n, lambda)` follows the law of large numbers, with cumulative means 
+approaching $\frac{1}{\lambda}$ as the number of observations $n \rightarrow \infty$.
+
+```{r fig1_1a, echo = SHOW.ALL | TRUE, cache = FALSE}
+set.seed(12345)
+nosim <- 1000
+
+means <- cumsum(rexp(nosim, lambda)) / (1  : nosim)
+g <- ggplot(data.frame(x = 1 : nosim, y = means), aes(x = x, y = y)) 
+g <- g + geom_hline(yintercept = mu, size = 2, color = "blue") + geom_line(size = 1) 
+g <- g + annotate("text", label = paste("E[x] = ", mu), x = 500, y = 1.15*mu, size = 8, colour = "blue")
+g + labs(x = paste("Number of obs of rexp(), lambda = ", lambda, ", E[x] = ", round(mu, 3)), y = "Cumulative mean")
+```
+
+Now, we look specifically at the central tendency of the sample means from 1,000 trials of 40 observations each.
+
+```{r fig1_1b, echo = SHOW.ALL | TRUE, cache = FALSE}
+n <- 40 
+x <- apply(matrix(sample(rexp(n, lambda), nosim, replace = TRUE), nosim), 1, mean)
+g <- ggplot(data.frame(x = x), aes(x = x)) + geom_histogram(alpha = .20, binwidth=.3, colour = "black", aes(y = ..density..)) 
+g + geom_vline(aes(xintercept = mean(x)), color = "red", linetype = "dashed", size = 1.5) +
+geom_text(aes(x = mean(x), label=paste("\nAverage of sample means = ", round(mean(x), 3)), y=0.15), 
+color="blue", angle=90, text=element_text(size=6))
+```
+
+In the figure above, with a relatively small number of observations per trial, the observed sample mean approximates the
+expected mean given by $\frac{1}{\lambda} = \frac{1}{0.2} = 5$.  This becomes more apparent if we boost the number of 
+observations per trial up to a larger number such as $n = 200$.
+
+```{r fig1_1c, echo = SHOW.ALL | TRUE, cache = FALSE}
+n <- 200
+x <- apply(matrix(sample(rexp(n, lambda), nosim, replace = TRUE), nosim), 1, mean)
+g <- ggplot(data.frame(x = x), aes(x = x)) + geom_histogram(alpha = .20, binwidth=.3, colour = "black", aes(y = ..density..)) 
+g + geom_vline(aes(xintercept = mean(x)), color = "red", linetype = "dashed", size = 1.5) +
+geom_text(aes(x = mean(x), label=paste("\nAverage of sample means = ", round(mean(x), 3)), y=0.15), 
+color="blue", angle=90, text=element_text(size=6))
+```
+
+## Variability
+
+Now, we show how variable the distribution is and we compare it to the theoretical variance of the distribution.
+
+```{r pt2_1, echo = SHOW.ALL | TRUE, cache = FALSE}
+n <- 40
 
 
 ```
 
-2. Show how variable it is and compare it to the theoretical variance of the distribution.
+## Normality
 
-```{r pt1_2, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-sir.mix.a.lot <- 6492568
-set.seed(sir.mix.a.lot)
+Through an experiment, we illustrate the approximate normality of the distribution by simulating of multiples of **`r nosim` trials** of 
+sample means of `rexp(n, lambda)`, where $\lambda = 0.2$, where each trial contains **`r n` observations** each. 
 
+```{r fig3_1, echo = SHOW.ALL | TRUE, cache = FALSE}
+n <- 40 
+cfunc <- function(x, n) sqrt(n) * (mean(x) - mu) / sigma
+dat <- data.frame(
+  x = c(apply(matrix(sample(rexp(n, lambda), nosim * 10, replace = TRUE), 
+                     nosim), 1, cfunc, 10),
+        apply(matrix(sample(rexp(n, lambda), nosim * 20, replace = TRUE), 
+                     nosim), 1, cfunc, 20),
+        apply(matrix(sample(rexp(n, lambda), nosim * 30, replace = TRUE), 
+                     nosim), 1, cfunc, 30)
+        ),
+  size = factor(rep(c(10, 20, 30), rep(nosim, 3))))
+g <- ggplot(dat, aes(x = x, fill = size)) + geom_histogram(alpha = .20, binwidth=.3, colour = "black", aes(y = ..density..)) 
+g <- g + stat_function(fun = dnorm, size = 2)
+g + facet_grid(. ~ size)
 ```
-
-3. Show that the distribution is approximately normal.
-
-```{r pt1_3, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-b52s <- 6060842
-set.seed(b52s)
-
-```
-
 
 4. Evaluate the coverage of the confidence interval for $\frac{1}{\lambda}$: $\overline{X}\pm{1.96}\frac{s}{\sqrt{n}}$.
 
-```{r pt1_4, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-the.time <- 7779311
-set.seed(the.time)
 
-
-```
 
 ### Evaluation notes
 
@@ -114,3 +174,6 @@ set.seed(the.time)
 # save working image so we can look at it later
 save.image("~/Google Drive/projects/r/coursera/statinference-006/statinference-006-pt1.RData")
 ```
+
+
+
