@@ -1,10 +1,10 @@
 ---
 title: "Tooth Growth in Guinea Pigs from Vitamin C Supplements"
 output:
-  word_document: default
+  html_document: default
   pdf_document:
     highlight: kate
-  html_document: default
+  word_document: default
 ---
 ```{r compile_opts, echo = FALSE}
     SHOW.ALL <- FALSE
@@ -51,7 +51,6 @@ Now, we'll perform our own exploratory analysis of the data, to address the foll
 * What is the average tooth length observed in the subjects for each dosage?  How are the averages different for each supplement?
 * Was there enough data collected to believe that the mean observations are statistically significant at the 95% confidence level?
 * Is there evidence to support the conclusion that Vitamin C delivered through ascorbic acid has the same impact as Vitamin C delivered in the form of ascorbic acid?
-
 
 ## Exploratory Analysis
 
@@ -125,7 +124,7 @@ required.packages
 0: No<br />
 1: Yes
 
-*Were the results of the tests and/or intervals interpreted in the context of the problem correctly? *
+*Were the results of the tests and/or intervals interpreted in the context of the problem correctly?*
 
 0: No<br />
 1: Yes
