@@ -1,10 +1,8 @@
 ---
-title: "Tooth Growth in Guinea Pigs from Vitamin C Supplements"
-output:
-  html_document: default
-  pdf_document:
-    highlight: kate
-  word_document: default
+title: "Statistical Inference Course Project, Part 2"
+author: "Allen Hammock"
+date: "October 12, 2014"
+output: html_document
 ---
 ```{r compile_opts, echo = FALSE}
     SHOW.ALL <- FALSE
@@ -15,7 +13,6 @@ output:
 ```{r initialize, echo = SHOW.ALL | FALSE}
 # set the working directory
 setwd("~/Google Drive/projects/r/coursera/statinference-006")
-image.path <- "~/Google Drive/projects/r/coursera/statinference-006/statinference-006-pt2.RData"
 
 # pre-load all required dependencies
 load.package <- function(x) {
@@ -28,63 +25,38 @@ load.package <- function(x) {
     }
 }
 
-required.packages <- c("dplyr", "ggplot2", "plyr")
+required.packages <- c("dplyr", "ggplot2")
 for(i in 1:length(required.packages)) {
     load.package(required.packages[i])   
 }
 ```
+# Background
 
-## Introduction
+## Part 2
 
-The `ToothGrowth` data set considers the effects of Vitamin C on tooth length in guinea pigs administered through two
-different supplements.  The supplements are administered to 10 subjects in three different 
-doses (0.5 mg, 1 mg and 2 mg) for a total of 60 observations.
+### Problems
 
-Examination of the help file for the data set reveals that the observations come from a study by C. I. Bliss published in 1952 called 
-*[The Statistics of Bioassay](http://oskicat.berkeley.edu/search~S1?/cRS190.V5+B55/crs++190+v5+b55/-3%2C-1%2C0%2CB/frameset&FF=crs++190+v5+b55&1%2C1%2C)*. Unfortunately this document is not available online for free for further examination.  Instead, we use `?ToothGrowth` for information.
+Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
 
-The help file provides very little information. We have no information about control groups for example.  We do not know the
-expected tooth length in guinea pigs who did not receive supplements.
-
-Now, we'll perform our own exploratory analysis of the data, to address the following questions:
-
-* What is the average tooth length observed in the subjects for each dosage?  How are the averages different for each supplement?
-* Was there enough data collected to believe that the mean observations are statistically significant at the 95% confidence level?
-* Is there evidence to support the conclusion that Vitamin C delivered through ascorbic acid has the same impact as Vitamin C delivered in the form of ascorbic acid?
-
-## Exploratory Analysis
-
-To get a sense of how the dosage level and supplement type interact, we plot the density of the sample means on 
-an overlapped graph where the distributions and means can be easily understood visually.
+1. Load the ToothGrowth data and perform some basic exploratory data analyses.
 
 ```{r pt2_1, echo = SHOW.ALL | TRUE, cache = FALSE}
-# gather summary statistics on tooth length as it varies by dosage and supplement type
-means <- ddply(ToothGrowth, c("supp", "dose"), summarize, sample.mean = mean(len), sample.sd = sd(len), sample.var = var(len))
-means
+# set the seed so others can reproduce easily
+alicia.keys <- 4894608
+set.seed(alicia.keys)
 
-# how are the samples distributed and are the means correlated?
-ggplot(ToothGrowth, aes(x = len, fill = supp)) + geom_density(alpha = 0.3) +
-    geom_vline(data = means, aes(xintercept=sample.mean,  color = supp),
-               linetype = "dashed", size = 2) + facet_grid(~ dose)
 ```
 
-## Summary of Data Set
-
-Analysis shows that the differences in the sample means of the tooth lengths in guinea pigs appears to trend toward zero as the dosage
-administered increases.  A simple visual analysis suggests that at the **2 mg** dosage, Vitamin C has the same effect on tooth length
-whether delivered through Orange Juice or Ascorbic Acid.
+2. Provide a basic summary of the data.
 
 ```{r pt2_2, echo = SHOW.ALL | TRUE, cache = FALSE}
-# what are the differences in the average tooth length?
-deltas <- ddply(means, c("dose"), summarize, OJ.vs.VC = paste(abs(round(diff(sample.mean), 3)), "mg difference in sample means"))
-deltas
+# set the seed so others can reproduce easily
+mike.jones <- 2818004
+set.seed(mike.jones)
 
 ```
 
-**However**, we must demonstrate that the data collected is statistically significant enough to support this hypothesis. For that,
-we turn to our confidence tests.
-
-## Confidence Tests
+3. Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose. (Use the techniques from class even if there's other approaches worth considering)
 
 ```{r pt2_3, echo = SHOW.ALL | TRUE, cache = FALSE}
 # set the seed so others can reproduce easily
@@ -93,20 +65,15 @@ set.seed(public.enemy)
 
 ```
 
-## Conclusions
-
-
-**Note:**
-
-The code presented above relied on several installed packages, the list given below. If you are knitting this document yourself
-from the original source, use `load("`r basename(image.path)`")` to load the environment into **R**.
+4. State your conclusions and the assumptions needed for your conclusions. 
 
 ```{r pt2_4, echo = SHOW.ALL | TRUE, cache = FALSE}
-# show required packages
-required.packages
+# set the seed so others can reproduce easily
+soulja.boy <- 9998212
+set.seed(soulja.boy)
+
 ```
 
-<!--
 ### Evalutation notes
 
 *Did the student perform an exploratory data analysis?*
@@ -124,7 +91,7 @@ required.packages
 0: No<br />
 1: Yes
 
-*Were the results of the tests and/or intervals interpreted in the context of the problem correctly?*
+*Were the results of the tests and/or intervals interpreted in the context of the problem correctly? *
 
 0: No<br />
 1: Yes
@@ -143,9 +110,9 @@ required.packages
 
 0: No it really was a poor effort<br />
 1: Yes, this was a nice attempt (regardless of correctness)
--->
+
 
 ```{r finalize, echo = SHOW.ALL | FALSE}
 # save working image so we can look at it later
-save.image(image.path)
+save.image("~/Google Drive/projects/r/coursera/statinference-006/statinference-006-pt2.RData")
 ```

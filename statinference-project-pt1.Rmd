@@ -1,9 +1,7 @@
 ---
 title: "Statistical Inference Course Project, Part I"
-output:
-  word_document: default
-  pdf_document:
-    highlight: kate
+author: "Allen Hammock (brainvat)"
+output: html_document
 ---
 ```{r compile_opts, echo = FALSE}
     SHOW.ALL <- FALSE
@@ -137,8 +135,6 @@ g <- g + stat_function(fun = dnorm, size = 2)
 g + facet_grid(. ~ size)
 ```
 
-This experiment demonstrates thta the distribution is approximately normal, as expected under the C.L.T.
-
 ## Coverage
 
 Finally, we valuate the coverage of the confidence interval for $\frac{1}{\lambda}$: $\overline{X}\pm{1.96}\frac{s}{\sqrt{n}}$.  We 
@@ -159,10 +155,8 @@ ggplot(data.frame(lvals, coverage), aes(x = lvals, y = coverage)) +
 geom_line(size = 2) + geom_hline(yintercept = 0.975)
 ```
 
-The data suggests that in general we are seeing very poor coverage for the confidence interval at 97.5th 
-percentile ($\overline{X}\pm{1.96}\frac{s}{\sqrt{n}}$).  
+TBD.
 
-<!-- 
 ### Evaluation notes
 
 *Regarding the distribution of the mean of 40 exponentials. Did the student show where the distribution is centered at and compare it  to the theoretical center of the distribution?*
@@ -194,8 +188,6 @@ percentile ($\overline{X}\pm{1.96}\frac{s}{\sqrt{n}}$).
 
 0: No, it was really a cursory effort<br />
 1: Yes, the student put in real effort and made an attempt t (regardless of correctness)
-
--->
 
 ```{r finalize, echo = SHOW.ALL | FALSE}
 # save working image so we can look at it later

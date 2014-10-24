@@ -3,4 +3,3 @@
 *.Rdata
 .Rhistory
 .Rproj.user
-*_cache/*
