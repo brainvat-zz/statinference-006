@@ -1,8 +1,12 @@
 ---
-title: "Statistical Inference Course Project, Part 2"
-author: "Allen Hammock"
-date: "October 12, 2014"
-output: html_document
+title: "Tooth Growth in Guinea Pigs from Vitamin C Supplements"
+output:
+  word_document: default
+  pdf_document:
+    highlight: kate
+  html_document:
+    highlight: monochrome
+    theme: journal
 ---
 ```{r compile_opts, echo = FALSE}
     SHOW.ALL <- FALSE
@@ -13,6 +17,7 @@ output: html_document
 ```{r initialize, echo = SHOW.ALL | FALSE}
 # set the working directory
 setwd("~/Google Drive/projects/r/coursera/statinference-006")
+image.path <- "~/Google Drive/projects/r/coursera/statinference-006/statinference-006-pt2.RData"
 
 # pre-load all required dependencies
 load.package <- function(x) {
@@ -25,55 +30,178 @@ load.package <- function(x) {
     }
 }
 
-required.packages <- c("dplyr", "ggplot2")
+required.packages <- c("dplyr", "ggplot2", "plyr")
 for(i in 1:length(required.packages)) {
     load.package(required.packages[i])   
 }
 ```
-# Background
 
-## Part 2
+## Introduction
 
-### Problems
+The `ToothGrowth` data set considers the effects of Vitamin C on tooth length in guinea pigs administered through two
+different supplements.  The supplements are administered to 10 subjects in three different 
+doses (0.5 mg, 1 mg and 2 mg) for a total of 60 observations.
 
-Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
+Examination of the help file for the data set reveals that the observations come from a study by C. I. Bliss published in 1952 called 
+*[The Statistics of Bioassay](http://oskicat.berkeley.edu/search~S1?/cRS190.V5+B55/crs++190+v5+b55/-3%2C-1%2C0%2CB/frameset&FF=crs++190+v5+b55&1%2C1%2C)*. Unfortunately this document is not available online for free for further examination.  Instead, we use `?ToothGrowth` for information.
 
-1. Load the ToothGrowth data and perform some basic exploratory data analyses.
+The help file provides very little information. We have no information about control groups for example.  We do not know the
+expected tooth length in guinea pigs who did not receive supplements.
+
+Now, we'll perform our own exploratory analysis of the data, to address the following questions:
+
+* What is the average tooth length observed in the subjects for each dosage?  How are the averages different for each supplement?
+* Was there enough data collected to believe that the mean observations are statistically significant at the 95% confidence level?
+* Is there evidence to support the conclusion that Vitamin C delivered through Orange Juice has the same impact as Vitamin C delivered in the form of Ascorbic Acid?
+
+## Exploratory Analysis
+
+To get a sense of how the dosage level and supplement type interact, we plot the density of the sample means on 
+an overlapped graph where the distributions and means can be easily understood visually.
 
 ```{r pt2_1, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-alicia.keys <- 4894608
-set.seed(alicia.keys)
+# gather summary statistics on tooth length as it varies by dosage and supplement type
+means <- ddply(ToothGrowth, c("supp", "dose"), summarize, sample.mean = mean(len), sample.sd = sd(len), sample.var = var(len))
+means
 
+# how are the samples distributed and are the means correlated?
+ggplot(ToothGrowth, aes(x = len, fill = supp)) + geom_density(alpha = 0.3) +
+    geom_vline(data = means, aes(xintercept=sample.mean,  color = supp),
+               linetype = "dashed", size = 2) + facet_grid(~ dose)
 ```
 
-2. Provide a basic summary of the data.
+## Summary of Data Set
+
+Analysis shows that the differences in the sample means of the tooth lengths in guinea pigs appears to trend toward zero as the dosage
+administered increases.  A simple visual analysis suggests that at the **2 mg** dosage, Vitamin C has the same effect on tooth length
+whether delivered through Orange Juice or Ascorbic Acid.
 
 ```{r pt2_2, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-mike.jones <- 2818004
-set.seed(mike.jones)
+# what are the differences in the average tooth length?
+deltas <- ddply(means, c("dose"), summarize, OJ.vs.VC = paste(abs(round(diff(sample.mean), 3)), "mg difference in sample means"))
+deltas
 
 ```
 
-3. Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose. (Use the techniques from class even if there's other approaches worth considering)
+**However**, we must demonstrate that the data collected is statistically significant enough to support this hypothesis. For that,
+we turn to our confidence tests.
 
-```{r pt2_3, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-public.enemy <- 911
-set.seed(public.enemy)
+## Confidence Tests
 
+The goal is to determine whether or not the data shows strong evidence that the method of delivery of Vitamin C, either 
+through Orange Juice or Ascorbic Acid, makes no difference to the effects on tooth growth in guinea pigs. First,
+let's review our assumptions:
+
+* **The 60 observations are drawn from 6 groups of 10 guinea pigs.** Since we are talking about tooth length, we must presume that in each of the experiments, guinea pigs were chosen at random and at birth and then observed over time as they matured. Because the groups under observation are all of the same size, in our significance test we can assume that the *pooled variance estimate* is the *weighted average of the group variances*.
+* **Our sample sizes are small, 10 subjects each, and the variance of the population is unknown.** Therefore, we will used a *two-tailed test of the population mean* using the sample standard deviation and sample mean to estimate the population.
+* **Different doses of Vitamin C were not given to the same guinea pigs.** Again, since different experiments on tooth growth cannot be observed in the same subjects, we will use the method of *independent (unpaired) sample t-tests* for our analysis.
+* **We will ignore the obvious confounder in the study, namely, that Vitamin C may have no significant impact on tooth length at all.** Since we don't have any data from a control group where no Vitamin C was administered, we can't really say whether or not the substance plays any meaningful role in the dental development of these rodents.
+
+Stated more formally:
+
+$$
+     H_0 = \mu_{OJ_2mg} - \mu_{VC_2mg} = 0
+$$
+$$
+     H_a = \mu_{OJ_2mg} - \mu_{VC_2mg} \neq 0
+$$
+$$
+    \alpha = 0.05
+$$
+
+```{r pt2_3a, echo = SHOW.ALL | TRUE, cache = FALSE}
+# Null Hypothesis, confidence
+H0 <- 0
+significance.level <- 1 - 0.95
+
+# Isolate the subjects given supplements at the 2 mg dosage level
+X.OJ <- ToothGrowth %>% filter(supp == "OJ" & dose == 2) %>% select(len) %>% .[[1]]
+X.VC <- ToothGrowth %>% filter(supp == "VC" & dose == 2) %>% select(len) %>% .[[1]]
+
+# Sample means
+MU.OJ <- mean(X.OJ)
+MU.VC <- mean(X.VC)
+N.OJ <- length(X.OJ)
+N.VC <- length(X.VC)
+
+# sample standard deviations
+SD.OJ <- sd(X.OJ)
+SD.VC <- sd(X.VC)
+
+# Pooled standard error
+SE <- sqrt((SD.OJ^2/N.OJ) + (SD.VC^2/N.VC))
+
+# Degrees of freedom
+DF <- SE^2 / ((SD.OJ^2/N.OJ)^2/(N.OJ-1) + (SD.VC^2/N.VC)^2/(N.VC-1))
+
+# T statistic, manually computed
+T <- ((MU.OJ - MU.VC) - H0)/SE
+
+# two-tailed t-test, assuming equal variance
+T.test <- t.test(X.OJ, X.VC, conf.level = 1 - significance.level, alternative = "two.sided", var.equal = FALSE)
 ```
 
-4. State your conclusions and the assumptions needed for your conclusions. 
+First, check our manually computed *t-statistic* versus the easy one we get from **R**.  If they are the same, then their
+differences will be zero (rounded at 10 digits).
+
+```{r pt2_3b, echo = SHOW.ALL | TRUE, cache = FALSE}
+# Correctly computed t statistic? (rounded to 10 digits)
+round(T - T.test$statistic, 10) == 0
+```
+
+Now, we check our computed probability score.  We need a *p-value* of less than 0.05 (95% confidence) in order to reject 
+the null hypothesis that the means should be zero.
+
+```{r pt2_3c, echo = SHOW.ALL | TRUE, cache = FALSE}
+# Reject the null hypothesis?
+T.test$p.value < significance.level 
+```
+
+Our computed *p-value*, `r T.test$p.value` is not less than the significance level `r significance.level`.  Therefore,
+we fail to reject the null hypothesis $H_0$ as expected.
+
+## Conclusions
+
+*Summary of Analysis*
+
+By plotting the densities from the outside, we had an intuitive notion that the differences in the sample means between
+the groups of guinea pigs would trend towards zero as the dosage increased.  We isolated two small independent groups of guinea pigs,
+who each received the same dosage of Vitamin C but through two different supplements.
+
+We set our null hypothesis to be that the differences in the population means between the two groups would be zero.  We 
+computed the sample means and used that to estimate the population means.  We further computed our sample means and
+calculated a weighted pooled variance based on the assumption of unequal variance between the samples.
+
+Finally, we computed our probability score using a *t-test* at the 95% confidence level, finding a *p-value* that was greater
+than the expected significance level.  Therefore, we were unable to reject the null hypothesis.
+
+This matches our observed intuition from the sample densities in the exploratory analysis.  We do not try to conclude whether
+the Vitamin C impacts tooth length.  Instead, we only conclude that the *form of the supplement* makes no difference on
+the effectiveness of Vitamin C, if that substance has any effect at all.
+
+*Multiple comparisons and other considerations*
+
+We noted in the assumptions that because we have no control groups among these guinea pigs, it's quite possible that
+Vitamin C has no effect at all on tooth length, and that the differences observed at various dosage level could be
+the product of random chance.  
+
+To see intuitively what is meant by **the problem of multiple comparisons**, check out
+this story on Wired [Scanning Dead Salmon in fMRI Machine Highlights Risk of Red Herrings](http://www.wired.com/2009/09/fmrisalmon/). 
+
+The problem of multiple comparisons is probably relevant in the case of **pigs who drink orange juice** but from the point
+of view of this study, beyond the scope of what we can analyze with this limited data set.
+
+**Note:**
+
+The code presented above relied on several installed packages, the list given below. If you are knitting this document yourself
+from the original source, use `load("`r basename(image.path)`")` to load the environment into **R**.
 
 ```{r pt2_4, echo = SHOW.ALL | TRUE, cache = FALSE}
-# set the seed so others can reproduce easily
-soulja.boy <- 9998212
-set.seed(soulja.boy)
-
+# show required packages
+required.packages
 ```
 
+<!--
 ### Evalutation notes
 
 *Did the student perform an exploratory data analysis?*
@@ -91,7 +219,7 @@ set.seed(soulja.boy)
 0: No<br />
 1: Yes
 
-*Were the results of the tests and/or intervals interpreted in the context of the problem correctly? *
+*Were the results of the tests and/or intervals interpreted in the context of the problem correctly?*
 
 0: No<br />
 1: Yes
@@ -110,9 +238,9 @@ set.seed(soulja.boy)
 
 0: No it really was a poor effort<br />
 1: Yes, this was a nice attempt (regardless of correctness)
-
+-->
 
 ```{r finalize, echo = SHOW.ALL | FALSE}
 # save working image so we can look at it later
-save.image("~/Google Drive/projects/r/coursera/statinference-006/statinference-006-pt2.RData")
+save.image(image.path)
 ```
